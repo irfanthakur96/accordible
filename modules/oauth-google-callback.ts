@@ -1,8 +1,14 @@
-import { ZuploRequest, ZuploContext } from "@zuplo/runtime";
+import { ZuploRequest, ZuploContext, environment } from "@zuplo/runtime";
+import { environment } from "@zuplo/runtime";
+
+const clientId = environment.GOOGLE_CLIENT_ID;
+const clientSecret = environment.GOOGLE_CLIENT_SECRET;
+const redirectUri = environment.GOOGLE_REDIRECT_URI;
+
 
 export default async function (request: ZuploRequest, context: ZuploContext) {
   const code = request.query.code;
-  
+
   if (!code) {
     return new Response("Authorization failed", { status: 400 });
   }
@@ -13,15 +19,15 @@ export default async function (request: ZuploRequest, context: ZuploContext) {
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
       code: code,
-      client_id: context.env.GOOGLE_CLIENT_ID,
-      client_secret: context.env.GOOGLE_CLIENT_SECRET,
-      redirect_uri: context.env.GOOGLE_REDIRECT_URI,
+      client_id: environment.GOOGLE_CLIENT_ID,
+      client_secret: environment.GOOGLE_CLIENT_SECRET,
+      redirect_uri: environment.GOOGLE_REDIRECT_URI,
       grant_type: "authorization_code"
     })
   });
 
   const tokens = await tokenResponse.json();
-  
+
   return new Response(`
     <script>
       window.opener.postMessage(${JSON.stringify(tokens)}, '*');
